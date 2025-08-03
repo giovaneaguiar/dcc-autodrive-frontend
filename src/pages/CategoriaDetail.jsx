@@ -1,28 +1,26 @@
-// src/pages/CategoriaDetail.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import categoriaService from '../services/categoriaService';
 
 function CategoriaDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [categoria, setCategoria] = useState({
-        nome: '',
-        descricao: '',
-    });
+    const [categoria, setCategoria] = useState({ descricao: '' });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const isNew = id === 'new';
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     useEffect(() => {
-        if (!isNew) {
+        if (id) {
             const fetchCategoria = async () => {
+                setLoading(true);
                 try {
                     const response = await categoriaService.getById(id);
                     setCategoria(response.data);
                 } catch (err) {
                     console.error("Erro ao buscar categoria:", err);
-                    setError("Erro ao carregar categoria. Tente novamente mais tarde.");
+                    setError("Erro ao carregar os dados da categoria.");
                 } finally {
                     setLoading(false);
                 }
@@ -31,48 +29,74 @@ function CategoriaDetail() {
         } else {
             setLoading(false);
         }
-    }, [id, isNew]);
+    }, [id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setCategoria(prevCategoria => ({
-            ...prevCategoria,
-            [name]: value
-        }));
+        setCategoria(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
-            if (isNew) {
-                await categoriaService.create(categoria);
-                alert("Categoria criada com sucesso!");
-            } else {
+            if (id) {
                 await categoriaService.update(id, categoria);
-                alert("Categoria atualizada com sucesso!");
+                setModalMessage("Categoria atualizada com sucesso!");
+            } else {
+                await categoriaService.create(categoria);
+                setModalMessage("Categoria criada com sucesso!");
             }
-            navigate('/categorias');
+            setShowModal(true);
+            setTimeout(() => navigate('/categorias'), 2000);
         } catch (err) {
             console.error("Erro ao salvar categoria:", err);
-            alert("Erro ao salvar categoria.");
+            setModalMessage("Erro ao salvar categoria.");
+            setShowModal(true);
+        } finally {
+            setLoading(false);
         }
     };
 
-    if (loading) return <div>Carregando...</div>;
-    if (error) return <div>{error}</div>;
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setModalMessage('');
+    };
+
+    if (loading) return <div className="text-center p-4">Carregando dados da categoria...</div>;
+    if (error) return <div className="text-center p-4 text-red-500">{error}</div>;
 
     return (
-        <div>
-            <h1>{isNew ? 'Criar Nova Categoria' : `Editar Categoria`}</h1>
+        <div className="form-container">
+            <h2 className="text-2xl font-bold mb-4">{id ? 'Editar Categoria' : 'Nova Categoria'}</h2>
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="descricao">Descrição:</label>
-                    <textarea id="descricao" name="descricao" value={categoria.descricao} onChange={handleChange} />
+                <div className="form-field">
+                    <label className="form-label">Descrição:</label>
+                    <input type="text" name="descricao" value={categoria.descricao} onChange={handleChange} className="form-input" />
                 </div>
-            
-                <button type="submit">Salvar</button>
-                <button type="button" onClick={() => navigate('/categorias')}>Cancelar</button>
+                
+                <div className="form-actions">
+                    <button type="button" onClick={() => navigate('/categorias')} className="cancel-button">
+                        Voltar
+                    </button>
+                    <button type="submit" className="submit-button">
+                        Salvar
+                    </button>
+                </div>
             </form>
+
+            {showModal && (
+                <div className="custom-modal-backdrop">
+                    <div className="custom-modal-content">
+                        <h3 className="text-lg font-bold">{modalMessage}</h3>
+                        <div className="custom-modal-actions">
+                            <button onClick={handleCloseModal} className="submit-button">
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

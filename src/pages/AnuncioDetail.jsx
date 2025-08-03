@@ -1,5 +1,4 @@
-// src/pages/AnuncioDetail.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import anuncioService from '../services/anuncioService';
 
@@ -8,147 +7,123 @@ function AnuncioDetail() {
     const navigate = useNavigate();
     const [anuncio, setAnuncio] = useState({
         dataAnuncio: '',
-        preco: 0,
+        preco: '',
         descricao: '',
         foto: '',
-        vendido: false,
+        vendido: false
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const isNew = id === 'new';
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     useEffect(() => {
-        if (!isNew) {
+        if (id) {
             const fetchAnuncio = async () => {
+                setLoading(true);
                 try {
                     const response = await anuncioService.getById(id);
-                    
-                    setAnuncio({
-                        ...response.data,
-                        dataAnuncio: response.data.dataAnuncio ? new Date(response.data.dataAnuncio).toISOString().split('T')[0] : '',
-                    });
+                    setAnuncio(response.data);
                 } catch (err) {
                     console.error("Erro ao buscar anúncio:", err);
-                    setError("Erro ao carregar anúncio. Tente novamente mais tarde.");
+                    setError("Erro ao carregar os dados do anúncio.");
                 } finally {
                     setLoading(false);
                 }
             };
             fetchAnuncio();
         } else {
-            
-            setAnuncio(prev => ({
-                ...prev,
-                dataAnuncio: new Date().toISOString().split('T')[0]
-            }));
             setLoading(false);
         }
-    }, [id, isNew]);
+    }, [id]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setAnuncio(prevAnuncio => ({
-            ...prevAnuncio,
+        setAnuncio(prev => ({
+            ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Opcional: Converter o preço para número antes de enviar
-        const anuncioToSave = {
-            ...anuncio,
-            preco: parseFloat(anuncio.preco),
-            // O backend espera um objeto Date para dataAnuncio. Se você está enviando 'YYYY-MM-DD',
-            // o Spring Boot deve ser capaz de converter automaticamente.
-            // Caso contrário, você pode precisar converter para um objeto Date aqui:
-            // dataAnuncio: new Date(anuncio.dataAnuncio)
-        };
-
+        setLoading(true);
         try {
-            if (isNew) {
-                await anuncioService.create(anuncioToSave);
-                alert("Anúncio criado com sucesso!");
+            if (id) {
+                await anuncioService.update(id, anuncio);
+                setModalMessage("Anúncio atualizado com sucesso!");
             } else {
-                await anuncioService.update(id, anuncioToSave);
-                alert("Anúncio atualizado com sucesso!");
+                await anuncioService.create(anuncio);
+                setModalMessage("Anúncio criado com sucesso!");
             }
-            navigate('/anuncios');
+            setShowModal(true);
+            setTimeout(() => navigate('/anuncios'), 2000);
         } catch (err) {
             console.error("Erro ao salvar anúncio:", err);
-            if (err.response) {
-                console.error("Dados do erro de resposta:", err.response.data);
-                console.error("Status do erro:", err.response.status);
-                alert(`Erro ao salvar anúncio: ${err.response.data.message || err.message}`);
-            } else {
-                alert("Erro ao salvar anúncio. Verifique o console para mais detalhes.");
-            }
+            setModalMessage("Erro ao salvar anúncio.");
+            setShowModal(true);
+        } finally {
+            setLoading(false);
         }
     };
 
-    if (loading) return <div>Carregando...</div>;
-    if (error) return <div>{error}</div>;
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setModalMessage('');
+    };
+
+    if (loading) return <div className="text-center p-4">Carregando dados do anúncio...</div>;
+    if (error) return <div className="text-center p-4 text-red-500">{error}</div>;
 
     return (
-        <div>
-            <h1>{isNew ? 'Criar Novo Anúncio' : `Editar Anúncio`}</h1>
+        <div className="form-container">
+            <h2 className="text-2xl font-bold mb-4">{id ? 'Editar Anúncio' : 'Novo Anúncio'}</h2>
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="dataAnuncio">Data do Anúncio:</label>
-                    <input
-                        type="date"
-                        id="dataAnuncio"
-                        name="dataAnuncio"
-                        value={anuncio.dataAnuncio}
-                        onChange={handleChange}
-                        required
-                    />
+                <div className="form-field">
+                    <label className="form-label">Data do Anúncio:</label>
+                    <input type="date" name="dataAnuncio" value={anuncio.dataAnuncio} onChange={handleChange} className="form-input" />
                 </div>
-                <div>
-                    <label htmlFor="preco">Preço:</label>
-                    <input
-                        type="number"
-                        id="preco"
-                        name="preco"
-                        value={anuncio.preco}
-                        onChange={handleChange}
-                        step="0.01" // Permite valores decimais
-                        required
-                    />
+                <div className="form-field">
+                    <label className="form-label">Preço:</label>
+                    <input type="number" name="preco" value={anuncio.preco} onChange={handleChange} className="form-input" />
                 </div>
-                <div>
-                    <label htmlFor="descricao">Descrição:</label>
-                    <textarea
-                        id="descricao"
-                        name="descricao"
-                        value={anuncio.descricao}
-                        onChange={handleChange}
-                    />
+                <div className="form-field">
+                    <label className="form-label">Descrição:</label>
+                    <textarea name="descricao" value={anuncio.descricao} onChange={handleChange} className="form-input"></textarea>
                 </div>
-                <div>
-                    <label htmlFor="foto">URL da Foto:</label>
-                    <input
-                        type="text"
-                        id="foto"
-                        name="foto"
-                        value={anuncio.foto}
-                        onChange={handleChange}
-                    />
+                <div className="form-field">
+                    <label className="form-label">Foto (URL):</label>
+                    <input type="text" name="foto" value={anuncio.foto} onChange={handleChange} className="form-input" />
                 </div>
-                <div>
-                    <label htmlFor="vendido">Vendido:</label>
-                    <input
-                        type="checkbox"
-                        id="vendido"
-                        name="vendido"
-                        checked={anuncio.vendido}
-                        onChange={handleChange}
-                    />
+                <div className="form-field">
+                    <label className="form-label">
+                        Vendido:
+                        <input type="checkbox" name="vendido" checked={anuncio.vendido} onChange={handleChange} className="ml-2" />
+                    </label>
                 </div>
-                <button type="submit">Salvar</button>
-                <button type="button" onClick={() => navigate('/anuncios')}>Cancelar</button>
+
+                <div className="form-actions">
+                    <button type="button" onClick={() => navigate('/anuncios')} className="cancel-button">
+                        Voltar
+                    </button>
+                    <button type="submit" className="submit-button">
+                        Salvar
+                    </button>
+                </div>
             </form>
+
+            {showModal && (
+                <div className="custom-modal-backdrop">
+                    <div className="custom-modal-content">
+                        <h3 className="text-lg font-bold">{modalMessage}</h3>
+                        <div className="custom-modal-actions">
+                            <button onClick={handleCloseModal} className="submit-button">
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -4,33 +4,79 @@ import AnuncioList from './pages/AnuncioList';
 import AnuncioDetail from './pages/AnuncioDetail';
 import CategoriaDetail from './pages/CategoriaDetail';
 import CategoriaList from './pages/CategoriaList';
+import EmpresaList from './pages/EmpresaList';
+import EmpresaDetail from './pages/EmpresaDetail';
 
-// O CSS que você tem no arquivo global centraliza o elemento #root.
-// Para garantir que todo o seu conteúdo seja tratado como um único bloco,
-// o envolvemos em uma única div.
+// import FavoritoList from './pages/FavoritoList';
+// import FinanciamentoList from './pages/FinanciamentoList';
+// import FotoList from './pages/FotoList';
+// import MarcaList from './pages/MarcaList';
+// import NotificacaoList from './pages/NotificacaoList';
+// import OpcionalList from './pages/OpcionalList';
+// import PagamentoList from './pages/PagamentoList';
+// import PropostaList from './pages/PropostaList';
+// import TipoList from './pages/TipoList';
+// import UsuarioList from './pages/UsuarioList';
+// import VeiculoList from './pages/VeiculoList';
+// import VendaList from './pages/VendaList';
 
 function App() {
   return (
     <Router>
       <div className="app-container">
-        <Routes>
-          <Route path="/" element={<h1>Bem-vindo ao AutoDrive</h1>} />
-        </Routes>
-        <div>
-          <h2>Menu de Funcionalidades</h2>
-        </div>
-        <div>
+        <h1>Bem-vindo ao AutoDrive</h1>
+        <div className="menu-container">
           <nav>
-            <ul>
+            <ul className="menu-list">
               <li>
                 <Link to="/anuncios">Anúncios</Link>
               </li>
               <li>
                 <Link to="/categorias">Categorias</Link>
               </li>
+              <li>
+                <Link to="/empresas">Empresas</Link>
+              </li>
+              <li>
+                <Link to="/favoritos">Favoritos</Link>
+              </li>
+              <li>
+                <Link to="/financiamentos">Financiamentos</Link>
+              </li>
+              <li>
+                <Link to="/fotos">Fotos</Link>
+              </li>
+              <li>
+                <Link to="/marcas">Marcas</Link>
+              </li>
+              <li>
+                <Link to="/notificacoes">Notificações</Link>
+              </li>
+              <li>
+                <Link to="/opcionais">Opcionais</Link>
+              </li>
+              <li>
+                <Link to="/pagamentos">Pagamentos</Link>
+              </li>
+              <li>
+                <Link to="/propostas">Propostas</Link>
+              </li>
+              <li>
+                <Link to="/tipos">Tipos</Link>
+              </li>
+              <li>
+                <Link to="/usuarios">Usuários</Link>
+              </li>
+              <li>
+                <Link to="/veiculos">Veículos</Link>
+              </li>
+              <li>
+                <Link to="/vendas">Vendas</Link>
+              </li>
             </ul>
           </nav>
         </div>
+
         <Routes>
           <Route path="/anuncios" element={<AnuncioList />} />
           <Route path="/anuncios/new" element={<AnuncioDetail />} />
@@ -38,6 +84,9 @@ function App() {
           <Route path="/categorias" element={<CategoriaList />} />
           <Route path="/categorias/new" element={<CategoriaDetail />} />
           <Route path="/categorias/edit/:id" element={<CategoriaDetail />} />
+          <Route path="/empresas" element={<EmpresaList />} />
+          <Route path="/empresas/new" element={<EmpresaDetail />} />
+          <Route path="/empresas/edit/:id" element={<EmpresaDetail />} />
         </Routes>
       </div>
     </Router>

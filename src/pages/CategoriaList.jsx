@@ -1,4 +1,3 @@
-// src/pages/CategoriaList.jsx
 import React, { useEffect, useState } from 'react';
 import categoriaService from '../services/categoriaService';
 import { Link } from 'react-router-dom';
@@ -41,30 +40,38 @@ function CategoriaList() {
     if (categorias.length === 0) return <div>Nenhuma categoria encontrada.</div>;
 
     return (
-        <div>
-            <h2>Lista de Categorias</h2>
-            <Link to="/categorias/new">Adicionar Nova Categoria</Link>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {categorias.map((categoria) => (
-                        <tr key={categoria.id}>
-                            <td>{categoria.id}</td>
-                            <td>{categoria.descricao || 'N/A'}</td>
-                            <td>
-                                <Link to={`/categorias/edit/${categoria.id}`}>Editar</Link>
-                                <button onClick={() => handleDelete(categoria.id)}>Excluir</button>
-                            </td>
+        <div className="container mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">Lista de Categorias</h2>
+            <Link to="/categorias/new" className="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 transition-colors">
+                Adicionar Nova Categoria
+            </Link>
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                <table className="global-list-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Ações</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {categorias.map((categoria) => (
+                            <tr key={categoria.id}>
+                                <td>{categoria.id}</td>
+                                <td>{categoria.descricao || 'N/A'}</td>
+                                <td>
+                                    <Link to={`/categorias/edit/${categoria.id}`} className="action-link">
+                                        Editar
+                                    </Link>
+                                    <button onClick={() => handleDelete(categoria.id)} className="action-button">
+                                        Excluir
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
