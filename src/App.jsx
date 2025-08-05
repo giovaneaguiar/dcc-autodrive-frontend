@@ -6,9 +6,11 @@ import CategoriaDetail from './pages/CategoriaDetail';
 import CategoriaList from './pages/CategoriaList';
 import EmpresaList from './pages/EmpresaList';
 import EmpresaDetail from './pages/EmpresaDetail';
+import FavoritoList from './pages/FavoritoList';
+import FavoritoDetail from './pages/FavoritoDetail';
+import FinanciamentoList from './pages/FinanciamentoList';
+import FinanciamentoDetail from './pages/FinanciamentoDetail';
 
-// import FavoritoList from './pages/FavoritoList';
-// import FinanciamentoList from './pages/FinanciamentoList';
 // import FotoList from './pages/FotoList';
 // import MarcaList from './pages/MarcaList';
 // import NotificacaoList from './pages/NotificacaoList';
@@ -87,6 +89,14 @@ function App() {
           <Route path="/empresas" element={<EmpresaList />} />
           <Route path="/empresas/new" element={<EmpresaDetail />} />
           <Route path="/empresas/edit/:id" element={<EmpresaDetail />} />
+          <Route path="/favoritos" element={<FavoritoList />} />
+          <Route path="/favoritos/new" element={<FavoritoDetail />}/>
+          <Route path="/favoritos/edit/:id" element={<FavoritoDetail />}/>
+          <Route path="/financiamentos" element={<FinanciamentoList />} />
+          <Route path="/financiamentos/new" element={<FinanciamentoDetail />}/>
+          <Route path="/financiamentos/edit/:id" element={<FinanciamentoDetail />}/>
+
+
         </Routes>
       </div>
     </Router>
