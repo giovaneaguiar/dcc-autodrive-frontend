@@ -10,12 +10,16 @@ import FavoritoList from './pages/FavoritoList';
 import FavoritoDetail from './pages/FavoritoDetail';
 import FinanciamentoList from './pages/FinanciamentoList';
 import FinanciamentoDetail from './pages/FinanciamentoDetail';
-
-// import FotoList from './pages/FotoList';
-// import MarcaList from './pages/MarcaList';
-// import NotificacaoList from './pages/NotificacaoList';
-// import OpcionalList from './pages/OpcionalList';
-// import PagamentoList from './pages/PagamentoList';
+import FotoList from './pages/FotoList';
+import FotoDetail from './pages/FotoDetail';
+import MarcaList from './pages/MarcaList';
+import MarcaDetail from './pages/MarcaDetail';
+import NotificacaoList from './pages/NotificacaoList';
+import NotificacaoDetail from './pages/NotificacaoDetail';
+import OpcionalList from './pages/OpcionalList';
+import OpcionalDetail from './pages/OpcionalDetail';
+import PagamentoList from './pages/PagamentoList';
+import PagamentoDetail from './pages/PagamentoDetail';
 // import PropostaList from './pages/PropostaList';
 // import TipoList from './pages/TipoList';
 // import UsuarioList from './pages/UsuarioList';
@@ -95,7 +99,21 @@ function App() {
           <Route path="/financiamentos" element={<FinanciamentoList />} />
           <Route path="/financiamentos/new" element={<FinanciamentoDetail />}/>
           <Route path="/financiamentos/edit/:id" element={<FinanciamentoDetail />}/>
-
+          <Route path="/fotos" element={<FotoList />} />
+          <Route path="/fotos/new" element={<FotoDetail />}/>
+          <Route path="/fotos/edit/:id" element={<FotoDetail />}/>
+          <Route path="/marcas" element={<MarcaList />} />
+          <Route path="/marcas/new" element={<MarcaDetail />}/>
+          <Route path="/marcas/edit/:id" element={<MarcaDetail />}/>
+          <Route path="/notificacoes" element={<NotificacaoList />} />
+          <Route path="/notificacoes/new" element={<NotificacaoDetail />}/>
+          <Route path="/notificacoes/edit/:id" element={<NotificacaoDetail />}/>
+          <Route path="/opcionais" element={<OpcionalList />} />
+          <Route path="/opcionais/new" element={<OpcionalDetail />}/>
+          <Route path="/opcionais/edit/:id" element={<OpcionalDetail />}/>
+          <Route path="/pagamentos" element={<PagamentoList />} />
+          <Route path="/pagamentos/new" element={<PagamentoDetail />}/>
+          <Route path="/pagamentos/edit/:id" element={<PagamentoDetail />}/>
 
         </Routes>
       </div>
