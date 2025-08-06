@@ -111,9 +111,11 @@ function PagamentoDetail() {
                 <div className="form-field">
                     <label className="form-label">Venda:</label>
                     <select name="venda" value={pagamento.venda ? pagamento.venda.id : ''} onChange={handleChange} className="form-input">
-                        <option value="">Selecione uma venda</option>
+                       <option value="">Selecione uma venda</option>
                         {vendas.map(sale => (
-                            <option key={sale.id} value={sale.id}>{sale.descricao || `Venda ID: ${sale.id}`}</option>
+                            <option key={sale.id} value={sale.id}>
+                                {`${sale.nomeVeiculo || 'Veículo Desconhecido'} - ${sale.nomeUsuario || 'Usuário Desconhecido'}`}
+                            </option>
                         ))}
                     </select>
                 </div>

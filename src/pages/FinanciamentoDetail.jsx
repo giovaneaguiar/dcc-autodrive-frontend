@@ -1,7 +1,10 @@
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import financiamentoService from '../services/financiamentoService';
 import vendaService from '../services/vendaService';
-import React, { useState, useEffect } from 'react';
+// Não precisamos mais importar usuarioService e veiculoService aqui
+// import usuarioService from '../services/usuarioService';
+// import veiculoService from '../services/veiculoService';
 
 function FinanciamentoDetail() {
     const { id } = useParams();
@@ -23,6 +26,7 @@ function FinanciamentoDetail() {
         const fetchData = async () => {
             setLoading(true);
             try {
+                // Busca vendas para o dropdown
                 const salesResponse = await vendaService.getAll();
                 setVendas(salesResponse.data);
 
@@ -112,7 +116,9 @@ function FinanciamentoDetail() {
                     <select name="venda" value={financiamento.venda ? financiamento.venda.id : ''} onChange={handleChange} className="form-input">
                         <option value="">Selecione uma venda</option>
                         {vendas.map(sale => (
-                            <option key={sale.id} value={sale.id}>{`Venda ID: ${sale.id}`}</option>
+                            <option key={sale.id} value={sale.id}>
+                                {`${sale.nomeVeiculo || 'Veículo Desconhecido'} - ${sale.nomeUsuario || 'Usuário Desconhecido'}`}
+                            </option>
                         ))}
                     </select>
                 </div>
