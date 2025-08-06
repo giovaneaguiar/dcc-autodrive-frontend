@@ -20,11 +20,16 @@ import OpcionalList from './pages/OpcionalList';
 import OpcionalDetail from './pages/OpcionalDetail';
 import PagamentoList from './pages/PagamentoList';
 import PagamentoDetail from './pages/PagamentoDetail';
-// import PropostaList from './pages/PropostaList';
-// import TipoList from './pages/TipoList';
-// import UsuarioList from './pages/UsuarioList';
-// import VeiculoList from './pages/VeiculoList';
-// import VendaList from './pages/VendaList';
+import PropostaList from './pages/PropostaList';
+import PropostaDetail from './pages/PropostaDetail';
+import TipoList from './pages/TipoList';
+import TipoDetail from './pages/TipoDetail';
+import UsuarioList from './pages/UsuarioList';
+import UsuarioDetail from './pages/UsuarioDetail';
+import VeiculoList from './pages/VeiculoList';
+import VeiculoDetail from './pages/VeiculoDetail';
+import VendaList from './pages/VendaList';
+import VendaDetail from './pages/VendaDetail';
 
 function App() {
   return (
@@ -114,7 +119,21 @@ function App() {
           <Route path="/pagamentos" element={<PagamentoList />} />
           <Route path="/pagamentos/new" element={<PagamentoDetail />}/>
           <Route path="/pagamentos/edit/:id" element={<PagamentoDetail />}/>
-
+          <Route path="/propostas" element={<PropostaList />} />
+          <Route path="/propostas/new" element={<PropostaDetail />} />
+          <Route path="/propostas/edit/:id" element={<PropostaDetail />} />
+          <Route path="/tipos" element={<TipoList />} />
+          <Route path="/tipos/new" element={<TipoDetail />} />
+          <Route path="/tipos/edit/:id" element={<TipoDetail />} />
+          <Route path="/usuarios" element={<UsuarioList />} />
+          <Route path="/usuarios/new" element={<UsuarioDetail />} />
+          <Route path="/usuarios/edit/:id" element={<UsuarioDetail />} />
+          <Route path="/veiculos" element={<VeiculoList />} />
+          <Route path="/veiculos/new" element={<VeiculoDetail />} />
+          <Route path="/veiculos/edit/:id" element={<VeiculoDetail />} />
+          <Route path="/vendas" element={<VendaList />} />
+          <Route path="/vendas/new" element={<VendaDetail />} />
+          <Route path="/vendas/edit/:id" element={<VendaDetail />} />
         </Routes>
       </div>
     </Router>
