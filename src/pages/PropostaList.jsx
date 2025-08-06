@@ -85,7 +85,7 @@ function PropostaList() {
                                 <td>{proposta.id}</td>
                                 <td>{proposta.descricao || 'N/A'}</td>
                                 <td>{proposta.valor ? `R$ ${proposta.valor.toFixed(2)}` : 'N/A'}</td>
-                                <td>{proposta.usuario ? proposta.usuario.nome : 'N/A'}</td> {/* Assumindo que Usuario tem um campo 'nome' */}
+                                <td>{proposta.nomeUsuario || 'N/A'}</td>
                                 <td>
                                     <Link to={`/propostas/edit/${proposta.id}`} className="action-link">
                                         Editar

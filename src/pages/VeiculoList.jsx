@@ -95,7 +95,7 @@ function VeiculoList() {
                                 <td>{veiculo.preco ? `R$ ${veiculo.preco.toFixed(2)}` : 'N/A'}</td>
                                 <td>{veiculo.ativo ? 'Sim' : 'Não'}</td>
                                 <td>{veiculo.condicao || 'N/A'}</td>
-                                <td>{veiculo.empresa ? veiculo.empresa.nome : 'N/A'}</td> {/* Assumindo que Empresa tem um campo 'nome' */}
+                                <td>{veiculo.nomeEmpresa || 'N/A'}</td> 
                                 <td>
                                     <Link to={`/veiculos/edit/${veiculo.id}`} className="action-link">
                                         Editar

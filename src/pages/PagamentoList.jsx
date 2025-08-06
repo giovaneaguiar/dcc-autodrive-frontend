@@ -89,7 +89,7 @@ function PagamentoList() {
                                 <td>{pagamento.metodo || 'N/A'}</td>
                                 <td>{pagamento.dataPagamento ? new Date(pagamento.dataPagamento).toLocaleDateString() : 'N/A'}</td>
                                 <td>{pagamento.descricao || 'N/A'}</td>
-                                <td>{pagamento.venda ? pagamento.venda.id : 'N/A'}</td> {/* Assumindo que Venda tem um campo 'id' */}
+                                <td>{pagamento.idVenda || 'N/A'}</td>
                                 <td>
                                     <Link to={`/pagamentos/edit/${pagamento.id}`} className="action-link">
                                         Editar

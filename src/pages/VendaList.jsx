@@ -92,8 +92,8 @@ function VendaList() {
                                 <td>{venda.concluido ? 'Sim' : 'Não'}</td>
                                 <td>{venda.descricao || 'N/A'}</td>
                                 <td>{venda.status || 'N/A'}</td>
-                                <td>{venda.usuario ? venda.usuario.nome : 'N/A'}</td> {/* Assumindo que Usuario tem um campo 'nome' */}
-                                <td>{venda.veiculo ? venda.veiculo.modelo : 'N/A'}</td> {/* Assumindo que Veiculo tem um campo 'modelo' */}
+                                <td>{venda.nomeUsuario || 'N/A'}</td> 
+                                <td>{venda.nomeVeiculo || 'N/A'}</td>
                                 <td>
                                     <Link to={`/vendas/edit/${venda.id}`} className="action-link">
                                         Editar

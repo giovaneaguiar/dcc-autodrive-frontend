@@ -91,7 +91,7 @@ function UsuarioList() {
                                 <td>{usuario.telefone || 'N/A'}</td>
                                 <td>{usuario.cpf || 'N/A'}</td>
                                 <td>{usuario.tipo || 'N/A'}</td>
-                                <td>{usuario.empresa ? usuario.empresa.nome : 'N/A'}</td> {/* Assumindo que Empresa tem um campo 'nome' */}
+                                <td>{usuario.nomeEmpresa || 'N/A'}</td>
                                 <td>
                                     <Link to={`/usuarios/edit/${usuario.id}`} className="action-link">
                                         Editar

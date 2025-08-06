@@ -89,7 +89,7 @@ function NotificacaoList() {
                                 <td>{notificacao.descricao || 'N/A'}</td>
                                 <td>{notificacao.valor ? `R$ ${notificacao.valor.toFixed(2)}` : 'N/A'}</td>
                                 <td>{notificacao.dataCriacao ? new Date(notificacao.dataCriacao).toLocaleDateString() : 'N/A'}</td>
-                                <td>{notificacao.usuario ? notificacao.usuario.nome : 'N/A'}</td> {/* Assumindo que Usuario tem um campo 'nome' */}
+                                <td>{notificacao.nomeUsuario || 'N/A'}</td>
                                 <td>
                                     <Link to={`/notificacoes/edit/${notificacao.id}`} className="action-link">
                                         Editar

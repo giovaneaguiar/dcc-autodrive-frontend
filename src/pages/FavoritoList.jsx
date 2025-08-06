@@ -86,8 +86,8 @@ function FavoritoList() {
                                 <td>{favorito.id}</td>
                                 <td>{favorito.dataFavorito ? new Date(favorito.dataFavorito).toLocaleDateString() : 'N/A'}</td>
                                 <td>{favorito.descricao || 'N/A'}</td>
-                                <td>{favorito.usuario ? favorito.usuario.nome : 'N/A'}</td> {/* Assumindo que Usuario tem um campo 'nome' */}
-                                <td>{favorito.veiculo ? favorito.veiculo.modelo : 'N/A'}</td> {/* Assumindo que Veiculo tem um campo 'modelo' */}
+                                <td>{favorito.idUsuario || 'N/A'}</td> 
+                                <td>{favorito.idVeiculo || 'N/A'}</td>
                                 <td>
                                     <Link to={`/favoritos/edit/${favorito.id}`} className="action-link">
                                         Editar

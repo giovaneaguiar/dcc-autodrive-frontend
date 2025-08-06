@@ -89,7 +89,7 @@ function FinanciamentoList() {
                                 <td>{financiamento.parcela || 'N/A'}</td>
                                 <td>{financiamento.observacao || 'N/A'}</td>
                                 <td>{financiamento.aprovado ? 'Sim' : 'Não'}</td>
-                                <td>{financiamento.venda ? financiamento.venda.id : 'N/A'}</td> {/* Assumindo que Venda tem um campo 'id' */}
+                                <td>{financiamento.idVenda || 'N/A'}</td>
                                 <td>
                                     <Link to={`/financiamentos/edit/${financiamento.id}`} className="action-link">
                                         Editar
