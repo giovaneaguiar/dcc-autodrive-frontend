@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import propostaService from '../services/propostaService';
-import usuarioService from '../services/usuarioService'; // Importa o serviço de usuário
+import usuarioService from '../services/usuarioService';
 
 function PropostaDetail() {
     const { id } = useParams();
@@ -22,11 +22,21 @@ function PropostaDetail() {
             setLoading(true);
             try {
                 const usersResponse = await usuarioService.getAll();
-                setUsuarios(usersResponse.data);
+                const allUsuarios = usersResponse.data;
+                setUsuarios(allUsuarios);
 
                 if (id) {
+                    // Se for uma edição, busca os dados da proposta
                     const propostaResponse = await propostaService.getById(id);
-                    setProposta(propostaResponse.data);
+                    const propostaData = propostaResponse.data;
+
+                    // Encontra o objeto de usuário completo a partir do idUsuario retornado pela API
+                    const userObj = allUsuarios.find(u => u.id === propostaData.idUsuario) || null;
+
+                    setProposta({
+                        ...propostaData,
+                        usuario: userObj,
+                    });
                 }
             } catch (err) {
                 console.error("Erro ao buscar dados:", err);
@@ -51,11 +61,17 @@ function PropostaDetail() {
         e.preventDefault();
         setLoading(true);
         try {
+            const propostaToSave = { ...proposta };
+
+            if (propostaToSave.usuario) {
+                propostaToSave.usuario = { id: propostaToSave.usuario.id };
+            }
+
             if (id) {
-                await propostaService.update(id, proposta);
+                await propostaService.update(id, propostaToSave);
                 setModalMessage("Proposta atualizada com sucesso!");
             } else {
-                await propostaService.create(proposta);
+                await propostaService.create(propostaToSave);
                 setModalMessage("Proposta criada com sucesso!");
             }
             setShowModal(true);

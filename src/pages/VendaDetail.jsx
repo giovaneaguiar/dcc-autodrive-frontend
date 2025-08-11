@@ -29,18 +29,31 @@ function VendaDetail() {
         const fetchData = async () => {
             setLoading(true);
             try {
+                // Busca todos os usuários e veículos para preencher os dropdowns
                 const [usersResponse, vehiclesResponse] = await Promise.all([
                     usuarioService.getAll(),
                     veiculoService.getAll()
                 ]);
-                setUsuarios(usersResponse.data);
-                setVeiculos(vehiclesResponse.data);
+                const allUsuarios = usersResponse.data;
+                const allVeiculos = vehiclesResponse.data;
+                setUsuarios(allUsuarios);
+                setVeiculos(allVeiculos);
 
                 if (id) {
+                    // Se for uma edição, busca os dados da venda
                     const vendaResponse = await vendaService.getById(id);
+                    const vendaData = vendaResponse.data;
+
+                    // Encontra o objeto de usuário completo a partir do idUsuario da venda
+                    const userObj = allUsuarios.find(u => u.id === vendaData.idUsuario) || null;
+                    // Encontra o objeto de veículo completo a partir do idVeiculo da venda
+                    const vehicleObj = allVeiculos.find(v => v.id === vendaData.idVeiculo) || null;
+
                     setVenda({
-                        ...vendaResponse.data,
-                        dataVenda: vendaResponse.data.dataVenda ? new Date(vendaResponse.data.dataVenda).toISOString().split('T')[0] : ''
+                        ...vendaData,
+                        usuario: userObj,
+                        veiculo: vehicleObj,
+                        dataVenda: vendaData.dataVenda ? new Date(vendaData.dataVenda).toISOString().split('T')[0] : ''
                     });
                 }
             } catch (err) {
@@ -68,11 +81,21 @@ function VendaDetail() {
         e.preventDefault();
         setLoading(true);
         try {
+            const vendaToSave = { ...venda };
+
+            // Antes de salvar, transforma os objetos de relacionamento em IDs
+            if (vendaToSave.usuario) {
+                vendaToSave.usuario = { id: vendaToSave.usuario.id };
+            }
+            if (vendaToSave.veiculo) {
+                vendaToSave.veiculo = { id: vendaToSave.veiculo.id };
+            }
+
             if (id) {
-                await vendaService.update(id, venda);
+                await vendaService.update(id, vendaToSave);
                 setModalMessage("Venda atualizada com sucesso!");
             } else {
-                await vendaService.create(venda);
+                await vendaService.create(vendaToSave);
                 setModalMessage("Venda criada com sucesso!");
             }
             setShowModal(true);
@@ -132,7 +155,6 @@ function VendaDetail() {
                     </select>
                 </div>
 
-                {/* Dropdowns para relacionamentos ManyToOne */}
                 <div className="form-field">
                     <label className="form-label">Usuário:</label>
                     <select name="usuario" value={venda.usuario ? venda.usuario.id : ''} onChange={handleChange} className="form-input">

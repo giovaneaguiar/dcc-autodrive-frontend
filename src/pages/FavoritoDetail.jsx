@@ -5,152 +5,183 @@ import usuarioService from '../services/usuarioService';
 import veiculoService from '../services/veiculoService'; 
 
 function FavoritoDetail() {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const [favorito, setFavorito] = useState({
-        dataFavorito: '',
-        descricao: '',
-        usuario: null,
-        veiculo: null,
-    });
-    const [usuarios, setUsuarios] = useState([]);
-    const [veiculos, setVeiculos] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-    const [modalMessage, setModalMessage] = useState('');
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [favorito, setFavorito] = useState({
+        dataFavorito: '',
+        descricao: '',
+        usuario: null,
+        veiculo: null,
+    });
+    const [usuarios, setUsuarios] = useState([]);
+    const [veiculos, setVeiculos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                // Busca usuários e veículos para os dropdowns
-                const [usersResponse, vehiclesResponse] = await Promise.all([
-                    usuarioService.getAll(),
-                    veiculoService.getAll()
-                ]);
-                setUsuarios(usersResponse.data);
-                setVeiculos(vehiclesResponse.data);
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const [usersResponse, vehiclesResponse] = await Promise.all([
+                    usuarioService.getAll(),
+                    veiculoService.getAll()
+                ]);
+                const allUsuarios = usersResponse.data;
+                const allVeiculos = vehiclesResponse.data;
 
-                if (id) {
-                    const favoritoResponse = await favoritoService.getById(id);
-                    setFavorito({
-                        ...favoritoResponse.data,
-                        dataFavorito: favoritoResponse.data.dataFavorito ? new Date(favoritoResponse.data.dataFavorito).toISOString().split('T')[0] : ''
-                    });
-                }
-            } catch (err) {
-                console.error("Erro ao buscar dados:", err);
-                setError("Erro ao carregar dados. Tente novamente mais tarde.");
-            } finally {
-                setLoading(false);
+                setUsuarios(allUsuarios);
+                setVeiculos(allVeiculos);
+
+                if (id) {
+                    const favoritoResponse = await favoritoService.getById(id);
+                    const favoritoData = favoritoResponse.data;
+                    
+                    console.log("Dados do Favorito recebidos:", favoritoData);
+                    console.log("Lista completa de Usuários:", allUsuarios);
+                    console.log("Lista completa de Veículos:", allVeiculos);
+
+                    const usuarioObj = allUsuarios.find(u => u.id === favoritoData.idUsuario) || null;
+                    const veiculoObj = allVeiculos.find(v => v.id === favoritoData.idVeiculo) || null;
+
+                    setFavorito({
+                        ...favoritoData,
+                        dataFavorito: favoritoData.dataFavorito ? new Date(favoritoData.dataFavorito).toISOString().split('T')[0] : '',
+                        usuario: usuarioObj,
+                        veiculo: veiculoObj,
+                    });
+                    
+                    console.log("Objeto Usuário encontrado e setado no estado:", usuarioObj);
+                    console.log("Objeto Veículo encontrado e setado no estado:", veiculoObj);
+                }
+            } catch (err) {
+                console.error("Erro ao buscar dados:", err);
+                setError("Erro ao carregar dados. Tente novamente mais tarde.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [id]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        if (name === 'usuario') {
+            setFavorito(prev => ({ ...prev, usuario: usuarios.find(u => u.id === parseInt(value)) || null }));
+        } else if (name === 'veiculo') {
+            setFavorito(prev => ({ ...prev, veiculo: veiculos.find(v => v.id === parseInt(value)) || null }));
+        } else {
+            setFavorito(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const favoritoToSave = { ...favorito };
+            
+            if (favoritoToSave.dataFavorito) {
+                const dateObj = new Date(favoritoToSave.dataFavorito);
+                favoritoToSave.dataFavorito = dateObj.toISOString();
             }
-        };
-        fetchData();
-    }, [id]);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        if (name === 'usuario') {
-            setFavorito(prev => ({ ...prev, usuario: usuarios.find(u => u.id === parseInt(value)) || null }));
-        } else if (name === 'veiculo') {
-            setFavorito(prev => ({ ...prev, veiculo: veiculos.find(v => v.id === parseInt(value)) || null }));
-        } else {
-            setFavorito(prev => ({ ...prev, [name]: value }));
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            if (id) {
-                await favoritoService.update(id, favorito);
-                setModalMessage("Favorito atualizado com sucesso!");
-            } else {
-                await favoritoService.create(favorito);
-                setModalMessage("Favorito criado com sucesso!");
+            
+            // Envia apenas o ID de cada entidade relacionada
+            if (favoritoToSave.usuario) {
+                favoritoToSave.usuario = { id: favoritoToSave.usuario.id };
             }
-            setShowModal(true);
-            setTimeout(() => navigate('/favoritos'), 2000);
-        } catch (err) {
-            console.error("Erro ao salvar favorito:", err);
-            setModalMessage("Erro ao salvar favorito.");
-            setShowModal(true);
-        } finally {
-            setLoading(false);
-        }
-    };
+            if (favoritoToSave.veiculo) {
+                favoritoToSave.veiculo = { id: favoritoToSave.veiculo.id };
+            }
 
-    const handleCloseModal = () => {
-        setShowModal(false);
-        setModalMessage('');
-    };
+            if (id) {
+                await favoritoService.update(id, favoritoToSave);
+                setModalMessage("Favorito atualizado com sucesso!");
+            } else {
+                await favoritoService.create(favoritoToSave);
+                setModalMessage("Favorito criado com sucesso!");
+            }
+            setShowModal(true);
+            setTimeout(() => navigate('/favoritos'), 2000);
+        } catch (err) {
+            console.error("Erro ao salvar favorito:", err);
+            setModalMessage("Erro ao salvar favorito.");
+            setShowModal(true);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    if (loading) return <div className="text-center p-4">Carregando dados do favorito...</div>;
-    if (error) return <div className="text-center p-4 text-red-500">{error}</div>;
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setModalMessage('');
+    };
 
-    return (
-        <div className="form-container">
-            <h2 className="text-2xl font-bold mb-4">{id ? 'Editar Favorito' : 'Novo Favorito'}</h2>
-            <form onSubmit={handleSubmit}>
-                {id && (
-                    <div className="form-field">
-                        <label className="form-label">ID:</label>
-                        <input type="text" name="id" value={id} readOnly className="form-input" />
-                    </div>
-                )}
-                <div className="form-field">
-                    <label className="form-label">Data do Favorito:</label>
-                    <input type="date" name="dataFavorito" value={favorito.dataFavorito} onChange={handleChange} className="form-input" />
-                </div>
-                <div className="form-field">
-                    <label className="form-label">Descrição:</label>
-                    <textarea name="descricao" value={favorito.descricao} onChange={handleChange} className="form-input"></textarea>
-                </div>
-                <div className="form-field">
-                    <label className="form-label">Usuário:</label>
-                    <select name="usuario" value={favorito.usuario ? favorito.usuario.id : ''} onChange={handleChange} className="form-input">
-                        <option value="">Selecione um usuário</option>
-                        {usuarios.map(user => (
-                            <option key={user.id} value={user.id}>{user.nome}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="form-field">
-                    <label className="form-label">Veículo:</label>
-                    <select name="veiculo" value={favorito.veiculo ? favorito.veiculo.id : ''} onChange={handleChange} className="form-input">
-                        <option value="">Selecione um veículo</option>
-                        {veiculos.map(vehicle => (
-                            <option key={vehicle.id} value={vehicle.id}>{vehicle.modelo}</option>
-                        ))}
-                    </select>
-                </div>
+    if (loading) return <div className="text-center p-4">Carregando dados do favorito...</div>;
+    if (error) return <div className="text-center p-4 text-red-500">{error}</div>;
 
-                <div className="form-actions">
-                    <button type="button" onClick={() => navigate('/favoritos')} className="cancel-button">
-                        Voltar
-                    </button>
-                    <button type="submit" className="submit-button">
-                        Salvar
-                    </button>
-                </div>
-            </form>
+    return (
+        <div className="form-container">
+            <h2 className="text-2xl font-bold mb-4">{id ? 'Editar Favorito' : 'Novo Favorito'}</h2>
+            <form onSubmit={handleSubmit}>
+                {id && (
+                    <div className="form-field">
+                        <label className="form-label">ID:</label>
+                        <input type="text" name="id" value={id} readOnly className="form-input" />
+                    </div>
+                )}
+                <div className="form-field">
+                    <label className="form-label">Data do Favorito:</label>
+                    <input type="date" name="dataFavorito" value={favorito.dataFavorito} onChange={handleChange} className="form-input" />
+                </div>
+                <div className="form-field">
+                    <label className="form-label">Descrição:</label>
+                    <textarea name="descricao" value={favorito.descricao} onChange={handleChange} className="form-input"></textarea>
+                </div>
+                <div className="form-field">
+                    <label className="form-label">Usuário:</label>
+                    <select name="usuario" value={favorito.usuario ? favorito.usuario.id : ''} onChange={handleChange} className="form-input">
+                        <option value="">Selecione um usuário</option>
+                        {usuarios.map(user => (
+                            <option key={user.id} value={user.id}>{user.nome}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="form-field">
+                    <label className="form-label">Veículo:</label>
+                    <select name="veiculo" value={favorito.veiculo ? favorito.veiculo.id : ''} onChange={handleChange} className="form-input">
+                        <option value="">Selecione um veículo</option>
+                        {veiculos.map(vehicle => (
+                            <option key={vehicle.id} value={vehicle.id}>{vehicle.modelo}</option>
+                        ))}
+                    </select>
+                </div>
 
-            {showModal && (
-                <div className="custom-modal-backdrop">
-                    <div className="custom-modal-content">
-                        <h3 className="text-lg font-bold">{modalMessage}</h3>
-                        <div className="custom-modal-actions">
-                            <button onClick={handleCloseModal} className="submit-button">
-                                OK
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
+                <div className="form-actions">
+                    <button type="button" onClick={() => navigate('/favoritos')} className="cancel-button">
+                        Voltar
+                    </button>
+                    <button type="submit" className="submit-button">
+                        Salvar
+                    </button>
+                </div>
+            </form>
+
+            {showModal && (
+                <div className="custom-modal-backdrop">
+                    <div className="custom-modal-content">
+                        <h3 className="text-lg font-bold">{modalMessage}</h3>
+                        <div className="custom-modal-actions">
+                            <button onClick={handleCloseModal} className="submit-button">
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }
 
 export default FavoritoDetail;

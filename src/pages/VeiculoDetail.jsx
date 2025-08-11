@@ -63,19 +63,49 @@ function VeiculoDetail() {
                     fotoService.getAll(),
                 ]);
 
-                setEmpresas(empresasResponse.data);
-                setCategorias(categoriasResponse.data);
-                setMarcas(marcasResponse.data);
-                setOpcionais(opcionaisResponse.data);
-                setTipos(tiposResponse.data);
-                setFotos(fotosResponse.data);
+                const allEmpresas = empresasResponse.data;
+                const allCategorias = categoriasResponse.data;
+                const allMarcas = marcasResponse.data;
+                const allOpcionais = opcionaisResponse.data;
+                const allTipos = tiposResponse.data;
+                const allFotos = fotosResponse.data;
+
+                setEmpresas(allEmpresas);
+                setCategorias(allCategorias);
+                setMarcas(allMarcas);
+                setOpcionais(allOpcionais);
+                setTipos(allTipos);
+                setFotos(allFotos);
 
                 if (id) {
                     const veiculoResponse = await veiculoService.getById(id);
+                    const veiculoData = veiculoResponse.data;
+                    
+                    // Logs para depuração
+                    console.log("Dados do Veículo recebidos:", veiculoData);
+                    console.log("Lista completa de Empresas:", allEmpresas);
+
+                    // Mapeia os IDs planos do backend para os objetos completos a partir das listas
+                    const empresaObj = allEmpresas.find(e => e.id === veiculoData.idEmpresa) || null;
+                    const categoriaObj = allCategorias.find(c => c.id === veiculoData.idCategoria) || null;
+                    const marcaObj = allMarcas.find(m => m.id === veiculoData.idMarca) || null;
+                    const opcionalObj = allOpcionais.find(o => o.id === veiculoData.idOpcional) || null;
+                    const tipoObj = allTipos.find(t => t.id === veiculoData.idTipo) || null;
+                    const fotoObj = allFotos.find(f => f.id === veiculoData.idFoto) || null;
+
                     setVeiculo({
-                        ...veiculoResponse.data,
-                        anuncio: veiculoResponse.data.anuncio ? new Date(veiculoResponse.data.anuncio).toISOString().split('T')[0] : ''
+                        ...veiculoData,
+                        anuncio: veiculoData.anuncio ? new Date(veiculoData.anuncio).toISOString().split('T')[0] : '',
+                        empresa: empresaObj,
+                        categoria: categoriaObj,
+                        marca: marcaObj,
+                        opcional: opcionalObj,
+                        tipo: tipoObj,
+                        foto: fotoObj,
                     });
+
+                    // Log para verificar se o objeto foi encontrado e setado no estado
+                    console.log("Objeto Empresa encontrado e setado no estado:", empresaObj);
                 }
             } catch (err) {
                 console.error("Erro ao buscar dados:", err);
@@ -89,6 +119,7 @@ function VeiculoDetail() {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        // Para os dropdowns, encontramos o objeto completo a partir da lista
         if (name === 'empresa') {
             setVeiculo(prev => ({ ...prev, empresa: empresas.find(item => item.id === parseInt(value)) || null }));
         } else if (name === 'categoria') {
@@ -110,11 +141,39 @@ function VeiculoDetail() {
         e.preventDefault();
         setLoading(true);
         try {
+            const veiculoToSave = { ...veiculo };
+
+            // Formata a data de anúncio para um formato completo, se existir
+            if (veiculoToSave.anuncio) {
+                const dateObj = new Date(veiculoToSave.anuncio);
+                veiculoToSave.anuncio = dateObj.toISOString();
+            }
+
+            // Envia apenas o ID de cada entidade relacionada
+            if (veiculoToSave.empresa) {
+                veiculoToSave.empresa = { id: veiculoToSave.empresa.id };
+            }
+            if (veiculoToSave.categoria) {
+                veiculoToSave.categoria = { id: veiculoToSave.categoria.id };
+            }
+            if (veiculoToSave.marca) {
+                veiculoToSave.marca = { id: veiculoToSave.marca.id };
+            }
+            if (veiculoToSave.opcional) {
+                veiculoToSave.opcional = { id: veiculoToSave.opcional.id };
+            }
+            if (veiculoToSave.tipo) {
+                veiculoToSave.tipo = { id: veiculoToSave.tipo.id };
+            }
+            if (veiculoToSave.foto) {
+                veiculoToSave.foto = { id: veiculoToSave.foto.id };
+            }
+
             if (id) {
-                await veiculoService.update(id, veiculo);
+                await veiculoService.update(id, veiculoToSave);
                 setModalMessage("Veículo atualizado com sucesso!");
             } else {
-                await veiculoService.create(veiculo);
+                await veiculoService.create(veiculoToSave);
                 setModalMessage("Veículo criado com sucesso!");
             }
             setShowModal(true);

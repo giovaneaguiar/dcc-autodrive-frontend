@@ -24,13 +24,19 @@ function NotificacaoDetail() {
             setLoading(true);
             try {
                 const usersResponse = await usuarioService.getAll();
-                setUsuarios(usersResponse.data);
+                const allUsuarios = usersResponse.data;
+                setUsuarios(allUsuarios);
 
                 if (id) {
                     const notificacaoResponse = await notificacaoService.getById(id);
+                    const notificacaoData = notificacaoResponse.data;
+
+                    const userObj = allUsuarios.find(u => u.id === notificacaoData.idUsuario) || null;
+
                     setNotificacao({
-                        ...notificacaoResponse.data,
-                        dataCriacao: notificacaoResponse.data.dataCriacao ? new Date(notificacaoResponse.data.dataCriacao).toISOString().split('T')[0] : ''
+                        ...notificacaoData,
+                        dataCriacao: notificacaoData.dataCriacao ? new Date(notificacaoData.dataCriacao).toISOString().split('T')[0] : '',
+                        usuario: userObj,
                     });
                 }
             } catch (err) {
@@ -56,11 +62,17 @@ function NotificacaoDetail() {
         e.preventDefault();
         setLoading(true);
         try {
+            const notificacaoToSave = { ...notificacao };
+
+            if (notificacaoToSave.usuario) {
+                notificacaoToSave.usuario = { id: notificacaoToSave.usuario.id };
+            }
+
             if (id) {
-                await notificacaoService.update(id, notificacao);
+                await notificacaoService.update(id, notificacaoToSave);
                 setModalMessage("Notificação atualizada com sucesso!");
             } else {
-                await notificacaoService.create(notificacao);
+                await notificacaoService.create(notificacaoToSave);
                 setModalMessage("Notificação criada com sucesso!");
             }
             setShowModal(true);

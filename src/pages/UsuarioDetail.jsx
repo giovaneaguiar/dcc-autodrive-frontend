@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import usuarioService from '../services/usuarioService';
-import empresaService from '../services/empresaService'; // Importa o serviço de empresa
+import empresaService from '../services/empresaService';
 
 function UsuarioDetail() {
     const { id } = useParams();
@@ -28,18 +28,27 @@ function UsuarioDetail() {
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
 
-    const tiposUsuario = ["ADMIN", "CLIENTE", "VENDEDOR"]; // Opções para o campo 'tipo'
+    const tiposUsuario = ["ADMIN", "CLIENTE", "VENDEDOR"];
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
+                // Busca todas as empresas para preencher o dropdown
                 const empresasResponse = await empresaService.getAll();
-                setEmpresas(empresasResponse.data);
+                const allEmpresas = empresasResponse.data;
+                setEmpresas(allEmpresas);
 
                 if (id) {
                     const usuarioResponse = await usuarioService.getById(id);
-                    setUsuario(usuarioResponse.data);
+                    const usuarioData = usuarioResponse.data;
+
+                    const empresaObj = allEmpresas.find(emp => emp.id === usuarioData.idEmpresa) || null;
+
+                    setUsuario({
+                        ...usuarioData,
+                        empresa: empresaObj,
+                    });
                 }
             } catch (err) {
                 console.error("Erro ao buscar dados:", err);
@@ -64,11 +73,17 @@ function UsuarioDetail() {
         e.preventDefault();
         setLoading(true);
         try {
+            const usuarioToSave = { ...usuario };
+
+            if (usuarioToSave.empresa) {
+                usuarioToSave.empresa = { id: usuarioToSave.empresa.id };
+            }
+
             if (id) {
-                await usuarioService.update(id, usuario);
+                await usuarioService.update(id, usuarioToSave);
                 setModalMessage("Usuário atualizado com sucesso!");
             } else {
-                await usuarioService.create(usuario);
+                await usuarioService.create(usuarioToSave);
                 setModalMessage("Usuário criado com sucesso!");
             }
             setShowModal(true);

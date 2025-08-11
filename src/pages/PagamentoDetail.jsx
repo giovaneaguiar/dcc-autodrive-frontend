@@ -23,14 +23,21 @@ function PagamentoDetail() {
         const fetchData = async () => {
             setLoading(true);
             try {
+                // Busca todas as vendas para preencher o dropdown
                 const salesResponse = await vendaService.getAll();
-                setVendas(salesResponse.data);
+                const allVendas = salesResponse.data;
+                setVendas(allVendas);
 
                 if (id) {
                     const pagamentoResponse = await pagamentoService.getById(id);
+                    const pagamentoData = pagamentoResponse.data;
+
+                    const saleObj = allVendas.find(v => v.id === pagamentoData.idVenda) || null;
+
                     setPagamento({
-                        ...pagamentoResponse.data,
-                        dataPagamento: pagamentoResponse.data.dataPagamento ? new Date(pagamentoResponse.data.dataPagamento).toISOString().split('T')[0] : ''
+                        ...pagamentoData,
+                        dataPagamento: pagamentoData.dataPagamento ? new Date(pagamentoData.dataPagamento).toISOString().split('T')[0] : '',
+                        venda: saleObj,
                     });
                 }
             } catch (err) {
@@ -56,11 +63,17 @@ function PagamentoDetail() {
         e.preventDefault();
         setLoading(true);
         try {
+            const pagamentoToSave = { ...pagamento };
+
+            if (pagamentoToSave.venda) {
+                pagamentoToSave.venda = { id: pagamentoToSave.venda.id };
+            }
+
             if (id) {
-                await pagamentoService.update(id, pagamento);
+                await pagamentoService.update(id, pagamentoToSave);
                 setModalMessage("Pagamento atualizado com sucesso!");
             } else {
-                await pagamentoService.create(pagamento);
+                await pagamentoService.create(pagamentoToSave);
                 setModalMessage("Pagamento criado com sucesso!");
             }
             setShowModal(true);
@@ -111,7 +124,7 @@ function PagamentoDetail() {
                 <div className="form-field">
                     <label className="form-label">Venda:</label>
                     <select name="venda" value={pagamento.venda ? pagamento.venda.id : ''} onChange={handleChange} className="form-input">
-                       <option value="">Selecione uma venda</option>
+                        <option value="">Selecione uma venda</option>
                         {vendas.map(sale => (
                             <option key={sale.id} value={sale.id}>
                                 {`${sale.nomeVeiculo || 'Veículo Desconhecido'} - ${sale.nomeUsuario || 'Usuário Desconhecido'}`}
